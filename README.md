@@ -35,7 +35,7 @@ In next step data will be extracted into two CSV files:
 - rates_by_dates.csv 
 - rates_by_monthes.csv
 
-Downloaded CSV file, as well as created CSV files with cleaned date, will be located in folder to which scrapper.py is downloaded.
+Downloaded CSV file, as well as created CSV files with cleaned data, will be located in folder to which scrapper.py is downloaded.
 
 ## Future
 No future work is planned.
