@@ -33,7 +33,7 @@ python /path/to/scrapper/scrapper.py
 Scrapper will download CSV file from [ecb website](https://www.ecb.europa.eu) with historical data.
 In next step data will be extracted into two CSV files: 
 - rates_by_dates.csv 
-- rates_by_monthes.csv
+- rates_by_months.csv
 
 Original CSV file, as well as created CSV files with cleaned data, will be located in folder to which scrapper.py is downloaded.
 
