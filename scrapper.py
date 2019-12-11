@@ -41,21 +41,19 @@ def download_zip_csv(url: str, url_to_download: str, path: str) -> str:
 def _filter_helper(file: str, columns_to_filter: list) -> list:
     data = pd.read_csv(file)
 
-    filtered_columns = DataFrame(data, columns=columns_to_filter)
+    filtered_data = DataFrame(data, columns=columns_to_filter)
+    filtered_data['Date'] = pd.to_datetime(filtered_data['Date'])
 
-    date_cond = pd.to_datetime(data['Date']) > pd.Timestamp(2018, 12, 31)
-    filtered_data = filtered_columns.loc[date_cond]
+    date_cond = filtered_data['Date'] > pd.Timestamp(2018, 12, 31)
+    filtered_data = filtered_data.loc[date_cond]
 
     return filtered_data
 
 
 def csv_by_dates(path: str, csv_file: str, columns_to_filter: list) -> str:
-    data = _filter_helper(f'{path}/{csv_file}', columns_to_filter)
-    clean_data = pd.DataFrame(columns=['Date', 'DKK', 'CAD'])
+    clean_data = _filter_helper(f'{path}/{csv_file}', columns_to_filter)
 
-    for index, row in data.iterrows():
-        clean_data = clean_data.append({'Date': row['Date'].replace('-', ''),
-                                        'DKK': row['DKK'], 'CAD': row['CAD']}, ignore_index=True)
+    clean_data['Date'] = clean_data.Date.dt.strftime('%Y%m%d')
 
     filename = f'{path}/rates_by_dates.csv'
     clean_data.to_csv(filename, index=False)
@@ -65,7 +63,6 @@ def csv_by_dates(path: str, csv_file: str, columns_to_filter: list) -> str:
 
 def csv_by_months(path: str, csv_file: str, columns_to_filter: list) -> str:
     dirty_data = _filter_helper(f'{path}/{csv_file}', columns_to_filter)
-    dirty_data['Date'] = pd.to_datetime(dirty_data['Date'])
 
     clean_data = dirty_data.set_index('Date').resample('M')['DKK', 'CAD'].mean()[::-1]
     clean_data = clean_data.reset_index()
