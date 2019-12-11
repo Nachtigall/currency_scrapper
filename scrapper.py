@@ -38,7 +38,7 @@ def download_zip_csv(url: str, url_to_download: str, path: str) -> str:
     return filenames[0]
 
 
-def _filter_helper(file: str, columns_to_filter: list) -> list:
+def clean_filter(file: str, columns_to_filter: list) -> list:
     data = pd.read_csv(file)
 
     filtered_data = DataFrame(data, columns=columns_to_filter)
@@ -50,10 +50,9 @@ def _filter_helper(file: str, columns_to_filter: list) -> list:
     return filtered_data
 
 
-def csv_by_dates(path: str, csv_file: str, columns_to_filter: list) -> str:
-    clean_data = _filter_helper(f'{path}/{csv_file}', columns_to_filter)
-
-    clean_data['Date'] = clean_data.Date.dt.strftime('%Y%m%d')
+def csv_by_dates(path: str, data: list) -> str:
+    clean_data = data.copy()
+    clean_data['Date'] = data.Date.dt.strftime('%Y%m%d')
 
     filename = f'{path}/rates_by_dates.csv'
     clean_data.to_csv(filename, index=False)
@@ -61,10 +60,9 @@ def csv_by_dates(path: str, csv_file: str, columns_to_filter: list) -> str:
     return filename
 
 
-def csv_by_months(path: str, csv_file: str, columns_to_filter: list) -> str:
-    dirty_data = _filter_helper(f'{path}/{csv_file}', columns_to_filter)
-
-    clean_data = dirty_data.set_index('Date').resample('M')['DKK', 'CAD'].mean()[::-1]
+def csv_by_months(path: str, data: list) -> str:
+    clean_data = data.copy()
+    clean_data = clean_data.set_index('Date').resample('M')['DKK', 'CAD'].mean()[::-1]
     clean_data = clean_data.reset_index()
     clean_data = clean_data.round(decimals=4)
 
@@ -84,8 +82,10 @@ if __name__ == '__main__':
 
     download_url = get_download_url(root_url)
     raw_file = download_zip_csv(root_url, download_url, current_folder)
-    csv_by_dates_name = csv_by_dates(current_folder, raw_file, columns_filter)
-    csv_by_months_name = csv_by_months(current_folder, raw_file, columns_filter)
+    cleaned_data = clean_filter(raw_file, columns_filter)
+
+    csv_by_dates_name = csv_by_dates(current_folder, cleaned_data)
+    csv_by_months_name = csv_by_months(current_folder, cleaned_data)
 
     result = f""" ============= Results =============
     Current folder: {current_folder}
