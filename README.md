@@ -1,5 +1,6 @@
 # Currency scrapper
 
+Test project to play with popular Pandas lib.
 
 ## Create virualenv
 
